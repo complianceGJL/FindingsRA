@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERCS Audit Findings Risk Assessment Tool</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header__content">
+                <h1 class="header__title">ERCS Audit Findings Risk Assessment Tool</h1>
+                <p class="header__subtitle">European Risk Classification Scheme for Aviation Audit Findings</p>
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="container">
+            <ul class="nav__list">
+                <li><button class="nav__button nav__button--active" data-section="dashboard">Dashboard</button></li>
+                <li><button class="nav__button" data-section="new-assessment">New Assessment</button></li>
+                <li><button class="nav__button" data-section="history">Findings History</button></li>
+                <li><button class="nav__button" data-section="reports">Reports</button></li>
+                <li><button class="nav__button" data-section="help">Help</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="container">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section section--active">
+                <div class="dashboard">
+                    <h2 class="section__title">Dashboard Overview</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3 class="stat-card__value" id="total-findings">0</h3>
+                            <p class="stat-card__label">Total Findings Assessed</p>
+                        </div>
+                        <div class="stat-card stat-card--red">
+                            <h3 class="stat-card__value" id="critical-findings">0</h3>
+                            <p class="stat-card__label">Critical Risk</p>
+                        </div>
+                        <div class="stat-card stat-card--yellow">
+                            <h3 class="stat-card__value" id="elevated-findings">0</h3>
+                            <p class="stat-card__label">Elevated Risk</p>
+                        </div>
+                        <div class="stat-card stat-card--green">
+                            <h3 class="stat-card__value" id="acceptable-findings">0</h3>
+                            <p class="stat-card__label">Acceptable Risk</p>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard__actions">
+                        <button class="btn btn--primary btn--lg" data-section="new-assessment">Start New Assessment</button>
+                    </div>
+
+                    <div class="recent-findings">
+                        <h3>Recent Findings</h3>
+                        <div id="recent-findings-list" class="findings-preview">
+                            <p class="empty-state">No findings assessed yet. Click "Start New Assessment" to begin.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- New Assessment Section -->
+            <section id="new-assessment" class="section">
+                <h2 class="section__title">New Risk Assessment</h2>
+                <form id="assessment-form" class="assessment-form">
+                    <div class="form-section">
+                        <h3>Basic Information</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Finding ID</label>
+                                <input type="text" id="finding-id" class="form-control" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Audit Date</label>
+                                <input type="date" id="audit-date" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Organization Name</label>
+                                <input type="text" id="organization-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Regulatory Area</label>
+                                <select id="regulatory-area" class="form-control" required>
+                                    <option value="">Select Area</option>
+                                    <option value="Part CAMO">Part CAMO</option>
+                                    <option value="Part M">Part M</option>
+                                    <option value="Part 145">Part 145</option>
+                                    <option value="AIR OPS">AIR OPS</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Auditor Name</label>
+                                <input type="text" id="auditor-name" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Finding Description</label>
+                            <textarea id="finding-description" class="form-control" rows="4" required placeholder="Describe the audit finding in detail..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Risk Assessment</h3>
+                        <div class="form-group">
+                            <label class="form-label">Compliance Area</label>
+                            <select id="compliance-area" class="form-control" required>
+                                <option value="">Select Compliance Area</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Severity Level</label>
+                            <div class="severity-options" id="severity-options">
+                                <!-- Severity options will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Barrier Assessment</label>
+                            <div class="barriers-container" id="barriers-container">
+                                <!-- Barriers will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <div class="risk-calculation">
+                            <h4>Risk Score Calculation</h4>
+                            <div class="calculation-display">
+                                <div class="calc-item">
+                                    <span class="calc-label">Probability Score:</span>
+                                    <span class="calc-value" id="probability-score">-</span>
+                                </div>
+                                <div class="calc-item">
+                                    <span class="calc-label">Final ERCS Score:</span>
+                                    <span class="calc-value calc-value--large" id="ercs-score">-</span>
+                                </div>
+                                <div class="calc-item">
+                                    <span class="calc-label">Risk Level:</span>
+                                    <span class="calc-value risk-level" id="risk-level">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn--secondary" id="reset-form">Reset</button>
+                        <button type="submit" class="btn btn--primary">Save Assessment</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- History Section -->
+            <section id="history" class="section">
+                <h2 class="section__title">Findings History</h2>
+                <div class="history-controls">
+                    <div class="filters">
+                        <select id="risk-filter" class="form-control">
+                            <option value="">All Risk Levels</option>
+                            <option value="RED">Critical Risk</option>
+                            <option value="YELLOW">Elevated Risk</option>
+                            <option value="GREEN">Acceptable Risk</option>
+                        </select>
+                        <select id="area-filter" class="form-control">
+                            <option value="">All Regulatory Areas</option>
+                            <option value="Part CAMO">Part CAMO</option>
+                            <option value="Part M">Part M</option>
+                            <option value="Part 145">Part 145</option>
+                            <option value="AIR OPS">AIR OPS</option>
+                        </select>
+                        <button class="btn btn--secondary" id="export-data">Export Data</button>
+                    </div>
+                </div>
+                <div class="history-table-container">
+                    <table class="history-table" id="history-table">
+                        <thead>
+                            <tr>
+                                <th data-sort="date">Date</th>
+                                <th data-sort="organization">Organization</th>
+                                <th data-sort="findingId">Finding ID</th>
+                                <th data-sort="ercsScore">ERCS Score</th>
+                                <th data-sort="riskLevel">Risk Level</th>
+                                <th data-sort="regulatoryArea">Regulatory Area</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody">
+                            <tr class="empty-row">
+                                <td colspan="7">No findings assessed yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports" class="section">
+                <h2 class="section__title">Reports & Analytics</h2>
+                <div class="reports-grid">
+                    <div class="report-card">
+                        <h3>Risk Distribution</h3>
+                        <div class="chart-container">
+                            <canvas id="risk-distribution-chart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                    <div class="report-card">
+                        <h3>Findings by Regulatory Area</h3>
+                        <div class="chart-container">
+                            <canvas id="regulatory-area-chart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                    <div class="report-card">
+                        <h3>ERCS Risk Matrix</h3>
+                        <div class="risk-matrix-container">
+                            <img src="https://pplx-res.cloudinary.com/image/upload/v1748867723/pplx_code_interpreter/409575fb_oqmoub.jpg" alt="ERCS Risk Assessment Matrix" class="risk-matrix-image">
+                        </div>
+                    </div>
+                    <div class="report-card">
+                        <h3>Compliance Areas Overview</h3>
+                        <div id="compliance-breakdown" class="compliance-breakdown">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Help Section -->
+            <section id="help" class="section">
+                <h2 class="section__title">Help & Guidance</h2>
+                <div class="help-content">
+                    <div class="help-section">
+                        <h3>ERCS Methodology Overview</h3>
+                        <p>The European Risk Classification Scheme (ERCS) adapted for audit findings provides a systematic approach to assess the risk associated with non-compliances identified during aviation audits.</p>
+                        
+                        <h4>Severity Levels</h4>
+                        <div class="severity-guide">
+                            <div class="severity-item">
+                                <span class="severity-code severity-code--x">X</span>
+                                <div>
+                                    <strong>EXTREME:</strong> Critical non-compliance with immediate safety implications requiring immediate regulatory action
+                                </div>
+                            </div>
+                            <div class="severity-item">
+                                <span class="severity-code severity-code--s">S</span>
+                                <div>
+                                    <strong>SIGNIFICANT:</strong> Serious non-compliance likely to lead to formal enforcement action
+                                </div>
+                            </div>
+                            <div class="severity-item">
+                                <span class="severity-code severity-code--m">M</span>
+                                <div>
+                                    <strong>MAJOR:</strong> Major non-compliance requiring mandatory corrective action
+                                </div>
+                            </div>
+                            <div class="severity-item">
+                                <span class="severity-code severity-code--i">I</span>
+                                <div>
+                                    <strong>MINOR:</strong> Minor non-compliance with limited operational impact
+                                </div>
+                            </div>
+                            <div class="severity-item">
+                                <span class="severity-code severity-code--e">E</span>
+                                <div>
+                                    <strong>ADMINISTRATIVE:</strong> Documentation or administrative issues
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4>Barrier Assessment Guidelines</h4>
+                        <p>Each barrier should be assessed based on its current effectiveness in preventing similar findings:</p>
+                        <ul>
+                            <li><strong>Failed (0):</strong> Barrier did not function or does not exist</li>
+                            <li><strong>Remaining Weak (1):</strong> Barrier exists but with significant deficiencies</li>
+                            <li><strong>Remaining Moderate (2):</strong> Barrier functions adequately but improvements needed</li>
+                            <li><strong>Remaining Strong (3):</strong> Barrier functions effectively</li>
+                        </ul>
+
+                        <h4>Risk Categories</h4>
+                        <div class="risk-categories">
+                            <div class="risk-category risk-category--red">
+                                <strong>Critical Risk (RED):</strong> Immediate action required - poses significant threat to airworthiness or safety
+                            </div>
+                            <div class="risk-category risk-category--yellow">
+                                <strong>Elevated Risk (YELLOW):</strong> Action required within defined timeframes
+                            </div>
+                            <div class="risk-category risk-category--green">
+                                <strong>Acceptable Risk (GREEN):</strong> Monitor and implement improvements as planned
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modal for finding details -->
+    <div id="finding-modal" class="modal">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3 class="modal__title">Finding Details</h3>
+                <button class="modal__close">&times;</button>
+            </div>
+            <div class="modal__body" id="modal-body">
+                <!-- Finding details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
